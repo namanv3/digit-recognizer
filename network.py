@@ -38,7 +38,7 @@ class Network():
 		# bias[i] is the bias from z_(i-1) to z_i. size will be len(z_i)
 		self.biases = [np.zeros((sizes[i], 1)) for i in range(1, self.num_layers)]
 	
-	def forward_propagation(self, x):
+	def forward_propagation(self, x, round_number):
 		"""
 		x has to have the shape self.input_size x N, where N is the number of data points.\n
 		Outputs the network output of size self.output_size x N
@@ -60,7 +60,7 @@ class Network():
 		return z_values, activations
 	
 	def get_predictions(self, x):
-		_, activations =  self.forward_propagation(x)
+		_, activations =  self.forward_propagation(x, 0)
 		return activations[-1]
 	
 	def get_accuracy(self, x, y):
@@ -79,7 +79,7 @@ class Network():
 	def one_round_one_point(self, x, y, round_number):
 		if not len(x[0]) == 1 and not len(y[0]) == 1:
 			raise ValueError("This trains only one point at a time")
-		z_values, activations = self.forward_propagation(x)
+		z_values, activations = self.forward_propagation(x, round_number)
 
 		deltas = [None] * self.num_hidden_layers
 		## Calculate delta_L
