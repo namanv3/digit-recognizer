@@ -63,7 +63,7 @@ std = np.std(x_train_normalized, axis=0)
 
 x_train_set, y_train_set, x_validation_set, y_validation_set = build_training_and_validation_sets(x_train_normalized, one_hot_y_train)
 
-network = Network([784, 16, 10], [af.LeakyRelU, af.Softmax], cf.CrossEntropy, debug=True)
+network = Network([784, 16, 10], [af.LeakyRelU, af.Softmax], cf.CrossEntropy, debug=False)
 network.learn(x_train_set, y_train_set, epochs=20000)
 
 validation_accuracy = network.validate(x_validation_set, y_validation_set)
