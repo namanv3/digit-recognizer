@@ -84,8 +84,8 @@ class Network():
 		deltas = [None] * self.num_hidden_layers
 		## Calculate delta_L
 		delta_from_cost_function = self.cost_function.apply_derivative(y, activations[-1])
-		delta_from_activation = self.activation_functions[-1].apply_jacobian(z_values[-1])
-		deltas[-1] = np.matmul(delta_from_activation.T, delta_from_cost_function)
+		delta_from_activation = self.activation_functions[-1].apply_jacobian(z_values[-1]).T
+		deltas[-1] = np.matmul(delta_from_activation, delta_from_cost_function)
 
 		## Calculate all deltas
 		for l in range(2,self.num_layers):
