@@ -1,4 +1,5 @@
 import numpy as np
+import initializations
 import activation_functions as af
 import cost_functions as cf
 
@@ -7,7 +8,8 @@ class Network():
 			  activation_functions: list[af.ActivationFunction], 
 			  cost_function: cf.CostFunction = cf.LeastSquaresMean,
 			  learning_rate: float = 0.01,
-			  debug = False
+			  debug = False,
+			  weights_initialization = initializations.he,
 		):
 		"""
 		Initializing a network with pre-determined number of layers and sizes of the layers\n
@@ -32,7 +34,7 @@ class Network():
 		
 		# weights[0] converts x to z_1. So size of w_i will be len(z_1) x len(z_0). x is z_0
 		# weights[i] converts z_(i-1) to z_i. So size of w_i will be len(z_i) x len(z_(i-1))
-		self.weights = [np.random.randn(sizes[i], sizes[i - 1]) * np.sqrt(2.0 / sizes[i - 1]) for i in range(1, self.num_layers)]
+		self.weights = [weights_initialization(sizes[i], sizes[i - 1]) for i in range(1, self.num_layers)]
 
 		# bias[0] is the bias from x to z_1. size will be len(z_1)
 		# bias[i] is the bias from z_(i-1) to z_i. size will be len(z_i)
