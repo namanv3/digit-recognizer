@@ -6,13 +6,16 @@ class Network():
 	def __init__(self, sizes: list[int], 
 			  activation_functions: list[af.ActivationFunction], 
 			  cost_function: cf.CostFunction = cf.LeastSquaresMean,
-			  learning_rate: float = 0.01
+			  learning_rate: float = 0.01,
+			  debug = False
 		):
 		"""
 		Initializing a network with pre-determined number of layers and sizes of the layers\n
 		Layer 0 is the input layer with size set to self.input_size\n
 		Layer -1 is the output layer with size set to self.output_size
 		"""
+		self.debug = debug
+
 		if not len(sizes) - len(activation_functions) == 1:
 			raise ValueError("Number of layers should be just 1 more than number of activations")
 		self.num_layers = len(sizes)
@@ -100,7 +103,7 @@ class Network():
 			delta_weights[-l] = np.matmul(delta_l, activations_l_1)
 		
 		for i in range(self.num_hidden_layers):
-			# if round_number % 20000 == 0:
+			# if round_number % 20000 == 0 and self.debug:
 			# 	print(f"for w_{i} grad mean/std/max/min:", np.mean(delta_weights[i]), np.std(delta_weights[i]), np.max(delta_weights[i]), np.min(delta_weights[i]))
 			self.weights[i] -= self.learning_rate * delta_weights[i]
 			self.biases[i] -= self.learning_rate * delta_biases[i]
@@ -111,11 +114,10 @@ class Network():
 			self.one_round_one_point(x[:, [random_idx]], y[:, [random_idx]], i)
 			if i % (epochs // 100) == 0:
 				self.learning_rate *= 0.9
-			if i % (epochs // 10) == 0:
+			if i % (epochs // 10) == 0 and self.debug:
 				print(f"Accuracy after {i} rounds: {self.get_accuracy(x, y)}")
 				print("\n")
-		print(f"Accuracy after {epochs} rounds: {self.get_accuracy(x, y)}\n")
+		print(f"Accuracy on training set: {self.get_accuracy(x, y)}")
 	
 	def validate(self, x_validation, y_validation):
-		accuracy = self.get_accuracy(x_validation, y_validation)
-		print(f"Accuracy on validation set {accuracy}")
+		return self.get_accuracy(x_validation, y_validation)

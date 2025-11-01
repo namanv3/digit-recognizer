@@ -15,6 +15,17 @@ def read_training_data():
 
 	return x_train.T, y_train
 
+def read_test_data():
+	data_frame = pd.read_csv("data/test.csv", header=0)
+
+	features = data_frame.iloc[:,1:]
+	labels = data_frame.iloc[:,0]
+
+	x_test = features.values
+	y_test = labels.values
+
+	return x_test.T, y_test
+
 def one_hot(Y):
     one_hot_Y = np.zeros((Y.size, Y.max() + 1))
     one_hot_Y[np.arange(Y.size), Y] = 1
@@ -52,4 +63,10 @@ x_train_set, y_train_set, x_validation_set, y_validation_set = build_training_an
 
 network = Network([784, 16, 10], [af.RelU, af.Softmax], cf.LeastSquaresMean)
 network.learn(x_train_set, y_train_set, epochs=20000)
-network.validate(x_validation_set, y_validation_set)
+
+validation_accuracy = network.validate(x_validation_set, y_validation_set)
+print(f"Accuracy on validation set {validation_accuracy}")
+
+x_test, y_test = read_test_data()
+test_accuracy = network.validate(x_test, one_hot(y_test))
+print(f"Accuracy on test set {test_accuracy}")
