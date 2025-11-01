@@ -51,7 +51,7 @@ def build_training_and_validation_sets(x, y, split_ratio = 0.8):
 
     return x_train, y_train, x_validation, y_validation
 
-def train_and_test(train_filename, test_filename, layer_sizes, activations, cost_function, weights_initialization, epochs):
+def train_and_test(train_filename, test_filename, layer_sizes, activations, cost_function, weights_initialization, epochs, debug = False):
     x_train, y_train = read_training_data(train_filename)
 
     mean = np.mean(x_train, axis=0)
@@ -65,7 +65,7 @@ def train_and_test(train_filename, test_filename, layer_sizes, activations, cost
 
     x_train_set, y_train_set, x_validation_set, y_validation_set = build_training_and_validation_sets(x_train_normalized, one_hot_y_train)
 
-    network = Network(layer_sizes, activations, cost_function, debug=False, weights_initialization=weights_initialization)
+    network = Network(layer_sizes, activations, cost_function, debug=debug, weights_initialization=weights_initialization)
     network.learn(x_train_set, y_train_set, epochs=epochs)
 
     validation_accuracy = network.validate(x_validation_set, y_validation_set)
