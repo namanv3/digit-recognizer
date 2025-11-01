@@ -1,3 +1,6 @@
+import warnings
+warnings.simplefilter("error", RuntimeWarning) # this is to catch overflows as errors in vs code debug mode
+
 import pandas as pd
 import numpy as np
 from network import Network
@@ -61,7 +64,7 @@ std = np.std(x_train_normalized, axis=0)
 
 x_train_set, y_train_set, x_validation_set, y_validation_set = build_training_and_validation_sets(x_train_normalized, one_hot_y_train)
 
-network = Network([784, 16, 10], [af.RelU, af.Softmax], cf.LeastSquaresMean)
+network = Network([784, 16, 10], [af.LeakyRelU, af.Softmax], cf.CrossEntropy)
 network.learn(x_train_set, y_train_set, epochs=20000)
 
 validation_accuracy = network.validate(x_validation_set, y_validation_set)
