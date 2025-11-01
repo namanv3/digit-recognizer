@@ -38,9 +38,9 @@ LeastSquaresMean = CostFunction("Least Squares Mean", least_squares_mean, least_
 ###########################################################################
 
 def cross_entropy(y, a):
-	return np.sum(y * np.log(a + 1e-12))
+	return - np.sum(y * np.log(a + 1e-12))
 
 def cross_entropy_derivative(y, a):
-	return y / (a + 1e-12)
+	return - y / (a + 1e-12)
 
 CrossEntropy = CostFunction("Cross Entropy", cross_entropy, cross_entropy_derivative)
