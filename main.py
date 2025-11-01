@@ -48,7 +48,6 @@ def build_training_and_validation_sets(x, y, split_ratio = 0.8):
     x_train, x_validation = x_shuffled[:, :split], x_shuffled[:, split:]
     y_train, y_validation = y_shuffled[:, :split], y_shuffled[:, split:]
 
-    print(f"{len(x_train[0])} training points and {len(x_validation[0])} validation points")
     return x_train, y_train, x_validation, y_validation
 
 x_train, y_train = read_training_data()

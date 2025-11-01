@@ -76,7 +76,7 @@ class Network():
 				correct += 1
 		return correct / num_points
 	
-	def one_round_one_point(self, x, y, round_number):
+	def one_round_one_point(self, x, y, round_number, total_rounds):
 		if not len(x[0]) == 1 and not len(y[0]) == 1:
 			raise ValueError("This trains only one point at a time")
 		z_values, activations = self.forward_propagation(x, round_number)
@@ -103,15 +103,21 @@ class Network():
 			delta_weights[-l] = np.matmul(delta_l, activations_l_1)
 		
 		for i in range(self.num_hidden_layers):
-			# if round_number % 20000 == 0 and self.debug:
-			# 	print(f"for w_{i} grad mean/std/max/min:", np.mean(delta_weights[i]), np.std(delta_weights[i]), np.max(delta_weights[i]), np.min(delta_weights[i]))
+			if self.debug:
+				print(f"Round {round_number}, dw_{i}, std: {np.std(delta_weights[i])}, mean: {np.mean(delta_weights[i])}, max: {np.max(delta_weights[i])}, min: {np.min(delta_weights[i])}")
+			
 			self.weights[i] -= self.learning_rate * delta_weights[i]
+			if self.debug:
+				print(f"Round {round_number}, w_{i}, std: {np.std(self.weights[i])}, mean: {np.mean(self.weights[i])}, max: {np.max(self.weights[i])}, min: {np.min(self.weights[i])}")
+			
 			self.biases[i] -= self.learning_rate * delta_biases[i]
+		if self.debug:
+			print("\n")
 	
 	def learn(self, x, y, epochs = 10000):
 		for i in range(epochs):
 			random_idx = np.random.randint(1, len(x[0]))
-			self.one_round_one_point(x[:, [random_idx]], y[:, [random_idx]], i)
+			self.one_round_one_point(x[:, [random_idx]], y[:, [random_idx]], i, epochs)
 			if i % (epochs // 100) == 0:
 				self.learning_rate *= 0.9
 			if i % (epochs // 10) == 0 and self.debug:
