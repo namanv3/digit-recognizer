@@ -88,7 +88,7 @@ def softmax_derivative(_):
 	raise ValueError("Softmax does not have a derivative in vector form as the Jacobian contains non zero terms outside the diagonal")
 
 def softmax_jacobian(z):
-	s = softmax(z).T
+	s = softmax(z)
 	return np.diagflat(s) - np.dot(s, s.T)
 
 Softmax = ActivationFunction("Softmax", softmax, softmax_derivative, softmax_jacobian)
