@@ -10,5 +10,5 @@ train_and_test(
 	activations = [af.LeakyRelU, af.Softmax],
 	cost_function = cf.CrossEntropy,
 	weights_initialization= initializations.he,
-	epochs = 250000,
+	epochs = 200000,
 )
