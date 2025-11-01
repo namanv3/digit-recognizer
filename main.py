@@ -35,7 +35,7 @@ def one_hot(Y):
     one_hot_Y = one_hot_Y.T
     return one_hot_Y
 
-def build_training_and_validation_sets(x, y, split_ratio = 0.2):
+def build_training_and_validation_sets(x, y, split_ratio = 0.8):
     num_samples = x.shape[1]
 
     indices = np.arange(num_samples)
@@ -44,7 +44,7 @@ def build_training_and_validation_sets(x, y, split_ratio = 0.2):
     x_shuffled = x[:, indices]
     y_shuffled = y[:, indices]
     
-    split = int(0.8 * num_samples)
+    split = int(split_ratio * num_samples)
     x_train, x_validation = x_shuffled[:, :split], x_shuffled[:, split:]
     y_train, y_validation = y_shuffled[:, :split], y_shuffled[:, split:]
 
