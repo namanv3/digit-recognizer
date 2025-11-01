@@ -33,11 +33,11 @@ class Network():
 		self.output_size = sizes[-1]
 		
 		# weights[0] converts x to z_1. So size of w_i will be len(z_1) x len(z_0). x is z_0
-		# weights[i] converts z_(i-1) to z_i. So size of w_i will be len(z_i) x len(z_(i-1))
+		# weights[i] converts a_(i-1) to z_i. So size of w_i will be len(z_i) x len(a_(i-1))
 		self.weights = [weights_initialization(sizes[i], sizes[i - 1]) for i in range(1, self.num_layers)]
 
 		# bias[0] is the bias from x to z_1. size will be len(z_1)
-		# bias[i] is the bias from z_(i-1) to z_i. size will be len(z_i)
+		# bias[i] is the bias from a_(i-1) to z_i. size will be len(z_i)
 		self.biases = [np.zeros((sizes[i], 1)) for i in range(1, self.num_layers)]
 	
 	def forward_propagation(self, x, round_number):
