@@ -4,9 +4,6 @@ warnings.simplefilter("error", RuntimeWarning) # this is to catch overflows as e
 import pandas as pd
 import numpy as np
 from network import Network
-import initializations
-import activation_functions as af
-import cost_functions as cf
 
 def read_training_data(filename):
 	data_frame = pd.read_csv(filename, header=0) # header = 0 is the default value
