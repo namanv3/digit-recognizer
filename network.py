@@ -105,16 +105,8 @@ class Network():
 			delta_weights[-l] = np.matmul(delta_l, activations_l_1)
 		
 		for i in range(self.num_hidden_layers):
-			if self.debug:
-				print(f"Round {round_number}, dw_{i}, std: {np.std(delta_weights[i])}, mean: {np.mean(delta_weights[i])}, max: {np.max(delta_weights[i])}, min: {np.min(delta_weights[i])}")
-			
 			self.weights[i] -= self.learning_rate * delta_weights[i]
-			if self.debug:
-				print(f"Round {round_number}, w_{i}, std: {np.std(self.weights[i])}, mean: {np.mean(self.weights[i])}, max: {np.max(self.weights[i])}, min: {np.min(self.weights[i])}")
-			
 			self.biases[i] -= self.learning_rate * delta_biases[i]
-		if self.debug:
-			print("\n")
 	
 	def learn(self, x, y, epochs = 10000):
 		for i in range(epochs):
