@@ -1,9 +1,9 @@
 import initializations
 import activation_functions as af
 import cost_functions as cf
-from train_and_test import train_and_test
+from train_and_test import read_train_test
 
-train_and_test(
+read_train_test(
 	train_filename="data/fashion-mnist/train.csv", 
 	test_filename="data/fashion-mnist/test.csv",
 	layer_sizes = [784, 16, 10],
