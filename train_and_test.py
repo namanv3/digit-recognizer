@@ -60,6 +60,8 @@ def train_and_test(x_train, y_train, x_test, y_test, layer_sizes, activations, c
 
     x_train_normalized = (x_train - mean) / (std + 1e-8)  # 1e-8 avoids divide-by-zero
     one_hot_y_train = one_hot(y_train)
+    if debug:
+         print(f"One hot matrix of y_train created. shape: { one_hot_y_train.shape}\n")
 
     mean = np.mean(x_train_normalized, axis=0)
     std = np.std(x_train_normalized, axis=0)
@@ -72,5 +74,8 @@ def train_and_test(x_train, y_train, x_test, y_test, layer_sizes, activations, c
     validation_accuracy = network.validate(x_validation_set, y_validation_set)
     print(f"Accuracy on validation set {validation_accuracy}")
 
-    test_accuracy = network.validate(x_test, one_hot(y_test))
+    one_hot_y_test = one_hot(y_test)
+    if debug:
+         print(f"One hot matrix of y_test created. shape: { one_hot_y_test.shape}\n")
+    test_accuracy = network.validate(x_test, one_hot_y_test)
     print(f"Accuracy on test set {test_accuracy}")    
