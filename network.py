@@ -107,7 +107,42 @@ class Network():
 		for i in range(self.num_hidden_layers):
 			self.weights[i] -= self.learning_rate * delta_weights[i]
 			self.biases[i] -= self.learning_rate * delta_biases[i]
-	
+
+	#### this does not work
+	def one_round(self, x, y, round_number, total_rounds):
+		z_values, activations = self.forward_propagation(x, round_number)
+
+		deltas = [None] * self.num_hidden_layers
+
+		## Calculate delta_L
+		delta_L = np.zeros_like(y)
+		for i in range(y.shape[1]):
+			y_curr = y[:, [i]]
+			z_curr = z_values[-1][:, [i]]
+			a_curr = activations[-1][:, [i]]
+			delta_from_cost_function = self.cost_function.apply_derivative(y_curr, a_curr)
+			delta_from_activation = self.activation_functions[-1].apply_jacobian(z_curr).T
+			delta_L[:, [i]] = np.matmul(delta_from_activation, delta_from_cost_function)
+		deltas[-1] = delta_L
+		## Calculate all deltas
+		for l in range(2,self.num_layers):
+			delta_l_plus_1 = deltas[-l + 1]
+			w_l_plus_1 = self.weights[-l + 1]
+			delta_from_l_plus_1 = np.matmul(w_l_plus_1.T, delta_l_plus_1)
+			delta_from_activation = self.activation_functions[-l].apply_jacobian(z_values[-l])
+			deltas[-l] = np.matmul(delta_from_activation, delta_from_l_plus_1)
+		
+		delta_biases = [np.sum(delta_i, axis=1, keepdims=True) for delta_i in deltas]
+		delta_weights = [None] * self.num_hidden_layers
+		for l in range(1, self.num_layers):
+			delta_l = deltas[-l]
+			activations_l_1 = activations[-l - 1].T
+			delta_weights[-l] = np.matmul(delta_l, activations_l_1)
+		
+		for i in range(self.num_hidden_layers):
+			self.weights[i] -= self.learning_rate * delta_weights[i]
+			self.biases[i] -= self.learning_rate * delta_biases[i]
+
 	def learn(self, x, y, epochs = 10000):
 		for i in range(epochs):
 			random_idx = np.random.randint(1, len(x[0]))
