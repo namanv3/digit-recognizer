@@ -10,5 +10,7 @@ read_train_test(
 	activations = [af.LeakyRelU, af.Softmax],
 	cost_function = cf.CrossEntropy,
 	weights_initialization= initializations.he,
-	epochs = 200000,
+	batch_size=5,	
+	epochs = 2,
+	debug=True,
 )

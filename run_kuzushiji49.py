@@ -24,9 +24,10 @@ train_and_test(
 	x_test = x_test,
 	y_test = y_test,
 	layer_sizes = [784, 256, 128, 49],
-	activations = [af.LeakyRelU, af.Softmax],
+	activations = [af.LeakyRelU, af.LeakyRelU, af.Softmax],
 	cost_function = cf.CrossEntropy,
 	weights_initialization= initializations.he,
-	epochs = 200000,
-	debug=True
+	batch_size=5,	
+	epochs = 2,
+	debug=True,
 )

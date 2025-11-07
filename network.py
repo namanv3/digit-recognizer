@@ -40,7 +40,7 @@ class Network():
 		# bias[i] is the bias from a_(i-1) to z_i. size will be len(z_i)
 		self.biases = [np.zeros((sizes[i], 1)) for i in range(1, self.num_layers)]
 	
-	def forward_propagation(self, x, round_number):
+	def forward_propagation(self, x):
 		"""
 		x has to have the shape self.input_size x N, where N is the number of data points.\n
 		Outputs the network output of size self.output_size x N
@@ -62,7 +62,7 @@ class Network():
 		return z_values, activations
 	
 	def get_predictions(self, x):
-		_, activations =  self.forward_propagation(x, 0)
+		_, activations =  self.forward_propagation(x)
 		return activations[-1]
 	
 	def get_accuracy(self, x, y):
@@ -77,40 +77,9 @@ class Network():
 			if prediction == actual:
 				correct += 1
 		return correct / num_points
-	
-	def one_round_one_point(self, x, y, round_number, total_rounds):
-		if not len(x[0]) == 1 and not len(y[0]) == 1:
-			raise ValueError("This trains only one point at a time")
-		z_values, activations = self.forward_propagation(x, round_number)
 
-		deltas = [None] * self.num_hidden_layers
-		## Calculate delta_L
-		delta_from_cost_function = self.cost_function.apply_derivative(y, activations[-1])
-		delta_from_activation = self.activation_functions[-1].apply_jacobian(z_values[-1]).T
-		deltas[-1] = np.matmul(delta_from_activation, delta_from_cost_function)
-
-		## Calculate all deltas
-		for l in range(2,self.num_layers):
-			delta_l_plus_1 = deltas[-l + 1]
-			w_l_plus_1 = self.weights[-l + 1]
-			delta_from_l_plus_1 = np.matmul(w_l_plus_1.T, delta_l_plus_1)
-			delta_from_activation = self.activation_functions[-l].apply_jacobian(z_values[-l])
-			deltas[-l] = np.matmul(delta_from_activation, delta_from_l_plus_1)
-		
-		delta_biases = [np.sum(delta_i, axis=1, keepdims=True) for delta_i in deltas]
-		delta_weights = [None] * self.num_hidden_layers
-		for l in range(1, self.num_layers):
-			delta_l = deltas[-l]
-			activations_l_1 = activations[-l - 1].T
-			delta_weights[-l] = np.matmul(delta_l, activations_l_1)
-		
-		for i in range(self.num_hidden_layers):
-			self.weights[i] -= self.learning_rate * delta_weights[i]
-			self.biases[i] -= self.learning_rate * delta_biases[i]
-
-	#### this does not work
-	def one_round(self, x, y, round_number, total_rounds):
-		z_values, activations = self.forward_propagation(x, round_number)
+	def one_round(self, x, y):
+		z_values, activations = self.forward_propagation(x)
 
 		deltas = [None] * self.num_hidden_layers
 
@@ -128,31 +97,37 @@ class Network():
 		for l in range(2,self.num_layers):
 			delta_l_plus_1 = deltas[-l + 1]
 			w_l_plus_1 = self.weights[-l + 1]
-			delta_from_l_plus_1 = np.matmul(w_l_plus_1.T, delta_l_plus_1)
-			delta_from_activation = self.activation_functions[-l].apply_jacobian(z_values[-l])
-			deltas[-l] = np.matmul(delta_from_activation, delta_from_l_plus_1)
-		
+			delta_l = np.zeros_like(z_values[-l])
+			for i in range(y.shape[1]):
+				delta_from_l_plus_1 = np.matmul(w_l_plus_1.T, delta_l_plus_1[:,[i]])
+				delta_from_activation = self.activation_functions[-l].apply_jacobian(z_values[-l][:,[i]])
+				delta_l[:, [i]] = np.matmul(delta_from_activation, delta_from_l_plus_1)
+			deltas[-l] = delta_l
+
 		delta_biases = [np.sum(delta_i, axis=1, keepdims=True) for delta_i in deltas]
 		delta_weights = [None] * self.num_hidden_layers
 		for l in range(1, self.num_layers):
 			delta_l = deltas[-l]
 			activations_l_1 = activations[-l - 1].T
-			delta_weights[-l] = np.matmul(delta_l, activations_l_1)
+			delta_weights[-l] = 1 / (y.shape[1]) * np.matmul(delta_l, activations_l_1)
 		
 		for i in range(self.num_hidden_layers):
 			self.weights[i] -= self.learning_rate * delta_weights[i]
 			self.biases[i] -= self.learning_rate * delta_biases[i]
 
-	def learn(self, x, y, epochs = 10000):
+	def learn(self, x, y, batch_size = 1000, epochs = 10):
+		num_points = x.shape[1]
+		num_round_per_epoch = num_points // batch_size
 		for i in range(epochs):
-			random_idx = np.random.randint(1, len(x[0]))
-			self.one_round_one_point(x[:, [random_idx]], y[:, [random_idx]], i, epochs)
-			if i % (epochs // 100) == 0:
-				self.learning_rate *= 0.9
-			if i % (epochs // 10) == 0 and self.debug:
-				print(f"Accuracy after {i} rounds: {self.get_accuracy(x, y)}")
-				print("\n")
-		print(f"Accuracy on training set: {self.get_accuracy(x, y)}")
+			for _ in range(num_round_per_epoch):
+				batch_indices = np.random.choice(len(x[0]), size=batch_size, replace=False)
+				x_batch = x[:, batch_indices]
+				y_batch = y[:, batch_indices]
+				self.one_round(x_batch, y_batch)
+			self.learning_rate *= 0.9
+			if self.debug:
+				print(f"Accuracy after epoch-{i}: {self.get_accuracy(x, y)}\n")
+		print(f"Accuracy on training set: {self.get_accuracy(x, y)}\n")
 	
 	def validate(self, x_validation, y_validation):
 		return self.get_accuracy(x_validation, y_validation)
