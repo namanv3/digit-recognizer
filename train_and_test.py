@@ -29,9 +29,8 @@ def read_test_data(filename):
 	return x_test.T, y_test
 
 def one_hot(Y):
-    one_hot_Y = np.zeros((Y.size, Y.max() + 1))
-    one_hot_Y[np.arange(Y.size), Y] = 1
-    one_hot_Y = one_hot_Y.T
+    Y = Y.ravel()
+    one_hot_Y = pd.get_dummies(Y, dtype=np.float32).to_numpy().T
     return one_hot_Y
 
 def build_training_and_validation_sets(x, y, split_ratio = 0.8):
