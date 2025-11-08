@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import initializations
 import activation_functions as af
@@ -119,14 +120,17 @@ class Network():
 		num_points = x.shape[1]
 		num_round_per_epoch = num_points // batch_size
 		for i in range(epochs):
+			start_time = time.perf_counter()
 			for _ in range(num_round_per_epoch):
 				batch_indices = np.random.choice(len(x[0]), size=batch_size, replace=False)
 				x_batch = x[:, batch_indices]
 				y_batch = y[:, batch_indices]
 				self.one_round(x_batch, y_batch)
 			self.learning_rate *= 0.9
+			end_time = time.perf_counter()
 			if self.debug:
-				print(f"Accuracy after epoch-{i}: {self.get_accuracy(x, y)}\n")
+				elapsed = end_time - start_time
+				print(f"Accuracy after epoch-{i}: {self.get_accuracy(x, y)}\nTime taken: {elapsed:.3f} seconds\n")
 		print(f"Accuracy on training set: {self.get_accuracy(x, y)}\n")
 	
 	def validate(self, x_validation, y_validation):
